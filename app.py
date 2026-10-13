@@ -6,7 +6,7 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="GSoC2026Smartgrid", layout="wide")
 
-# ── CSS ──────────────────────────────────────────────────────────────────────
+# ── CSS ─
 st.markdown("""
 <style>
   .stApp { background:#f6f7f9; color:#1f2937;
@@ -30,19 +30,19 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ── Assets ───────────────────────────────────────────────────────────────────
+# ── Assets ─────────
 WIND = "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmp1NjY0ZTVudXByYmVqcnE0emk1ZGNwN21jOHE1azA5Z3htOHNucCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3MbRNvfnMyUJeKGlsw/giphy.gif"
 LOAD = "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWY4cjBlM2ljemoya3J3a2d1OXFnc2Q5ZDY5ZmllZ3Q0dnAxZGJ3ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XZcwMvQLRf9aXRa3qW/giphy.gif"
 BESS = "https://apatura.energy/wp-content/uploads/2024/12/BESS.jpg"
 GRID = "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXUwN3JxZWM5Mjd3dGs3azJ3YTd2aGZqeXdicmg2d2J2dGtvdjdkNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Qa0n2cnLuyDqYra4zk/giphy.gif"
 
-# ── Session init ──────────────────────────────────────────────────────────────
+# ── Session init ────
 if "model" not in st.session_state:
     st.session_state.model = MicrogridModel()
     st.session_state.steps = 0
 model = st.session_state.model
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+# ── Sidebar ─
 st.sidebar.title("System Control")
 st.sidebar.caption("Configure and run the microgrid simulation.")
 steps_input = st.sidebar.number_input(
@@ -72,7 +72,7 @@ if reset_clicked:
     st.session_state.steps = 0
     st.rerun()
 
-# ── Live values ───────────────────────────────────────────────────────────────
+# ── Live values ──────
 prod       = float(model.wind.production)
 cons       = float(model.load1.consumption + model.load2.consumption)
 soc        = float(model.battery.soc)
@@ -84,7 +84,7 @@ action     = model.history[-1]["action"] if model.history else "idle"
 MODE       = {"charge": ("Charging","#1d4ed8"), "discharge": ("Discharging","#b45309")}
 mode_text, mode_color = MODE.get(action, ("Standby","#6b7280"))
 
-# ── Header ────────────────────────────────────────────────────────────────────
+# ── Header ──
 st.markdown('<div class="app-title">GSoC2026Smartgrid</div>', unsafe_allow_html=True)
 st.markdown('<div class="app-sub">Microgrid simulation — renewable generation, '
             'battery dispatch, and grid interaction using Mesa + Random Forest.</div>',
@@ -94,7 +94,7 @@ st.markdown(f'<span class="pill" style="background:{mode_color}15;color:{mode_co
             unsafe_allow_html=True)
 st.write("")
 
-# ── Metrics ───────────────────────────────────────────────────────────────────
+# ── Metrics ───────
 st.markdown('<div class="panel"><div class="ptitle">Key metrics</div></div>',
             unsafe_allow_html=True)
 cols = st.columns(5)
@@ -112,7 +112,7 @@ for col, lbl, val, note in [
                     unsafe_allow_html=True)
 st.write("")
 
-# ── Summary + battery ─────────────────────────────────────────────────────────
+# ── Summary + battery ───
 saving     = rule_cost - total_cost
 saving_pct = (saving / rule_cost * 100) if rule_cost > 0 else 0.0
 scls       = "save-pos" if saving >= 0 else "save-neg"
@@ -135,8 +135,8 @@ with r2:
     st.progress(max(0.0, min(1.0, soc / 100.0)))
 st.write("")
 
-# ── Flow diagram ──────────────────────────────────────────────────────────────
-#
+
+
 # Node edges (these are the ONLY valid start/end points for the dot):
 #   Grid    bottom  = y:110   centre_x = 350
 #   Wind    right   = x:150   centre_y = 230
@@ -151,8 +151,7 @@ st.write("")
 #   BUS→Batt  : x=350, y=260 → y=340
 #
 # Dot = 14×14px so top-left = centre − 7.
-# Dot starts and ends at wire endpoints (node edges), travels through BUS
-# centre (hidden behind BUS box via z-index).
+
 
 if action == "charge":
     STATUS = "#059669"
@@ -262,7 +261,7 @@ st.write("")
 
 st.write("")
 
-# ── Performance charts ────────────────────────────────────────────────────────
+# ── Performance charts ──
 st.markdown('<div class="panel"><div class="ptitle">System performance over time'
             '</div></div>', unsafe_allow_html=True)
 
