@@ -3,19 +3,11 @@ from mesa.time import RandomActivation
 import numpy as np
 from ml_model import load_model, predict
 
-
-# =============================================================================
 # BDI structure for the BatteryAgent
-#
 # In a Belief-Desire-Intention architecture:
 #   Beliefs  = what the agent currently knows about the world
 #   Desire   = the agent's overarching goal
 #   Intention = the action the agent commits to this step
-#
-# Mesa does not provide these primitives natively, so we define them here.
-# This is one of the concrete gaps documented in BEHAVIORAL_NOTES.md.
-# =============================================================================
-
 class BatteryBeliefs:
     """
     Encapsulates everything the battery agent "knows" at a given step.
@@ -69,9 +61,8 @@ def get_intention(beliefs, ml_model):
     return action
 
 
-# =============================================================================
 # Mesa Agents
-# =============================================================================
+
 
 class WindAgent(Agent):
     """
@@ -142,9 +133,7 @@ class BatteryAgent(Agent):
         self.soc = max(self.soc - delta, 0.0)
 
 
-# =============================================================================
-# Rule-based baseline controller (runs as a shadow for cost comparison)
-# =============================================================================
+# Rule-based baseline controller 
 
 def rule_based_action(net, soc, price):
     """
@@ -161,10 +150,7 @@ def rule_based_action(net, soc, price):
     else:
         return "idle"
 
-
-# =============================================================================
 # MicrogridModel
-# =============================================================================
 
 class MicrogridModel(Model):
     """
@@ -214,7 +200,7 @@ class MicrogridModel(Model):
         # TOU pricing: off-peak $1, on-peak $3
         self.price = 1.0 if self.step_count % 10 < 5 else 3.0
 
-        # ── BDI dispatch cycle ────────────────────────────────────────────
+        # ── BDI dispatch cycle ─
         beliefs   = BatteryBeliefs(self.battery.soc, production,
                                    consumption, self.price, net)
         ml_action = get_intention(beliefs, self.ml_model)
@@ -232,7 +218,7 @@ class MicrogridModel(Model):
         ml_cost          = self.grid_import * self.price
         self.total_cost += ml_cost
 
-        # ── Rule-based shadow run ─────────────────────────────────────────
+        # ── Rule-based shadow run ──────
         rb_action      = rule_based_action(net, self.battery.soc, self.price)
         rb_grid_import = 0.0
 
@@ -247,7 +233,7 @@ class MicrogridModel(Model):
         rb_cost               = rb_grid_import * self.price
         self.rule_total_cost += rb_cost
 
-        # ── Record ───────────────────────────────────────────────────────
+        # ── Record ──
         self.history.append({
             "production":      production,
             "consumption":     consumption,
